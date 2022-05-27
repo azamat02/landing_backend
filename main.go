@@ -76,18 +76,6 @@ func HandleForm(c *fiber.Ctx) error {
 
 	id := 0
 
-	err = DB.QueryRow(context.Background(), "insert into forms_data (name, organization, phone, email, send_date) values($1,$2,$3,$4,$5) returning id",
-		data["name"],
-		data["organization"],
-		data["phone"],
-		data["email"],
-		time.Now()).Scan(&id)
-
-	if err != nil {
-		l.Error("ERROR: %s", err)
-		return err
-	}
-
 	t := time.Now()
 	formatted := fmt.Sprintf("%d-%02d-%02dT%02d:%02d:%02d",
 		t.Year(), t.Month(), t.Day(),
@@ -101,6 +89,18 @@ func HandleForm(c *fiber.Ctx) error {
 	if !sent {
 		l.Error("Telegram message not sent!")
 		l.Error("ERROR: %s", err)
+	}
+
+	err = DB.QueryRow(context.Background(), "insert into forms_data (name, organization, phone, email, send_date) values($1,$2,$3,$4,$5) returning id",
+		data["name"],
+		data["organization"],
+		data["phone"],
+		data["email"],
+		time.Now()).Scan(&id)
+
+	if err != nil {
+		l.Error("ERROR: %s", err)
+		return err
 	}
 
 	return c.JSON(fiber.Map{
