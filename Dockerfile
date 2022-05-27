@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build .\main.go
+RUN go build main.go
 
 EXPOSE 4000:4000
 
